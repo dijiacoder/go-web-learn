@@ -8,10 +8,10 @@ import (
 )
 
 func InitConfig() error {
-	viper.SetConfigName("config") // 配置文件名称（无扩展名）
-	viper.SetConfigType("yaml")   // 配置文件类型
-	viper.AddConfigPath(".")      // 查找配置文件的路径
-	return viper.ReadInConfig()   // 读取配置文件
+	viper.SetConfigName("config")    // 配置文件名称（无扩展名）
+	viper.SetConfigType("yaml")      // 配置文件类型
+	viper.AddConfigPath("./configs") // 查找配置文件的路径
+	return viper.ReadInConfig()      // 读取配置文件
 }
 
 func InitDB() (*gorm.DB, error) {

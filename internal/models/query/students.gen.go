@@ -6,7 +6,7 @@ package query
 
 import (
 	"context"
-	"github.com/dijiacoder/go-web-learn/internal/model"
+	"database/sql"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -16,13 +16,15 @@ import (
 	"gorm.io/gen/field"
 
 	"gorm.io/plugin/dbresolver"
+
+	"github.com/dijiacoder/go-web-learn/internal/models/entity"
 )
 
 func newStudent(db *gorm.DB, opts ...gen.DOOption) student {
 	_student := student{}
 
 	_student.studentDo.UseDB(db, opts...)
-	_student.studentDo.UseModel(&model.Student{})
+	_student.studentDo.UseModel(&entity.Student{})
 
 	tableName := _student.studentDo.TableName()
 	_student.ALL = field.NewAsterisk(tableName)
@@ -156,17 +158,17 @@ type IStudentDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IStudentDo
 	Unscoped() IStudentDo
-	Create(values ...*model.Student) error
-	CreateInBatches(values []*model.Student, batchSize int) error
-	Save(values ...*model.Student) error
-	First() (*model.Student, error)
-	Take() (*model.Student, error)
-	Last() (*model.Student, error)
-	Find() ([]*model.Student, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Student, err error)
-	FindInBatches(result *[]*model.Student, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*entity.Student) error
+	CreateInBatches(values []*entity.Student, batchSize int) error
+	Save(values ...*entity.Student) error
+	First() (*entity.Student, error)
+	Take() (*entity.Student, error)
+	Last() (*entity.Student, error)
+	Find() ([]*entity.Student, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*entity.Student, err error)
+	FindInBatches(result *[]*entity.Student, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.Student) (info gen.ResultInfo, err error)
+	Delete(...*entity.Student) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -178,10 +180,12 @@ type IStudentDo interface {
 	Assign(attrs ...field.AssignExpr) IStudentDo
 	Joins(fields ...field.RelationField) IStudentDo
 	Preload(fields ...field.RelationField) IStudentDo
-	FirstOrInit() (*model.Student, error)
-	FirstOrCreate() (*model.Student, error)
-	FindByPage(offset int, limit int) (result []*model.Student, count int64, err error)
+	FirstOrInit() (*entity.Student, error)
+	FirstOrCreate() (*entity.Student, error)
+	FindByPage(offset int, limit int) (result []*entity.Student, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
+	Rows() (*sql.Rows, error)
+	Row() *sql.Row
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IStudentDo
 	UnderlyingDB() *gorm.DB
@@ -280,57 +284,57 @@ func (s studentDo) Unscoped() IStudentDo {
 	return s.withDO(s.DO.Unscoped())
 }
 
-func (s studentDo) Create(values ...*model.Student) error {
+func (s studentDo) Create(values ...*entity.Student) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return s.DO.Create(values)
 }
 
-func (s studentDo) CreateInBatches(values []*model.Student, batchSize int) error {
+func (s studentDo) CreateInBatches(values []*entity.Student, batchSize int) error {
 	return s.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (s studentDo) Save(values ...*model.Student) error {
+func (s studentDo) Save(values ...*entity.Student) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return s.DO.Save(values)
 }
 
-func (s studentDo) First() (*model.Student, error) {
+func (s studentDo) First() (*entity.Student, error) {
 	if result, err := s.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Student), nil
+		return result.(*entity.Student), nil
 	}
 }
 
-func (s studentDo) Take() (*model.Student, error) {
+func (s studentDo) Take() (*entity.Student, error) {
 	if result, err := s.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Student), nil
+		return result.(*entity.Student), nil
 	}
 }
 
-func (s studentDo) Last() (*model.Student, error) {
+func (s studentDo) Last() (*entity.Student, error) {
 	if result, err := s.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Student), nil
+		return result.(*entity.Student), nil
 	}
 }
 
-func (s studentDo) Find() ([]*model.Student, error) {
+func (s studentDo) Find() ([]*entity.Student, error) {
 	result, err := s.DO.Find()
-	return result.([]*model.Student), err
+	return result.([]*entity.Student), err
 }
 
-func (s studentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Student, err error) {
-	buf := make([]*model.Student, 0, batchSize)
+func (s studentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*entity.Student, err error) {
+	buf := make([]*entity.Student, 0, batchSize)
 	err = s.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -338,7 +342,7 @@ func (s studentDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) err
 	return results, err
 }
 
-func (s studentDo) FindInBatches(result *[]*model.Student, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (s studentDo) FindInBatches(result *[]*entity.Student, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return s.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -364,23 +368,23 @@ func (s studentDo) Preload(fields ...field.RelationField) IStudentDo {
 	return &s
 }
 
-func (s studentDo) FirstOrInit() (*model.Student, error) {
+func (s studentDo) FirstOrInit() (*entity.Student, error) {
 	if result, err := s.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Student), nil
+		return result.(*entity.Student), nil
 	}
 }
 
-func (s studentDo) FirstOrCreate() (*model.Student, error) {
+func (s studentDo) FirstOrCreate() (*entity.Student, error) {
 	if result, err := s.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Student), nil
+		return result.(*entity.Student), nil
 	}
 }
 
-func (s studentDo) FindByPage(offset int, limit int) (result []*model.Student, count int64, err error) {
+func (s studentDo) FindByPage(offset int, limit int) (result []*entity.Student, count int64, err error) {
 	result, err = s.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -409,7 +413,7 @@ func (s studentDo) Scan(result interface{}) (err error) {
 	return s.DO.Scan(result)
 }
 
-func (s studentDo) Delete(models ...*model.Student) (result gen.ResultInfo, err error) {
+func (s studentDo) Delete(models ...*entity.Student) (result gen.ResultInfo, err error) {
 	return s.DO.Delete(models)
 }
 
