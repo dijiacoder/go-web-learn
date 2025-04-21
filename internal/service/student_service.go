@@ -2,31 +2,24 @@ package service
 
 import (
 	"context"
-	"github.com/dijiacoder/go-web-learn/internal/models/entity"
-	"github.com/dijiacoder/go-web-learn/internal/models/query"
-	"gorm.io/gorm"
+	"github.com/dijiacoder/go-web-learn/internal/model/gen/entity"
+	"github.com/dijiacoder/go-web-learn/internal/repository"
 )
 
 type StudentService struct {
-	q  *query.Query
-	db *gorm.DB
+	StudentRepo *repository.StudentRepository
 }
 
-func NewStudentService(db *gorm.DB) *StudentService {
+func NewStudentService(container *repository.Container) *StudentService {
 	return &StudentService{
-		q:  query.Use(db),
-		db: db,
+		StudentRepo: container.StudentRepo,
 	}
 }
 
-func (r *StudentService) GetStudentByID(id uint) (*entity.Student, error) {
-	student, err := r.q.Student.WithContext(context.Background()).Where(r.q.Student.ID.Eq(int32(id))).First()
-	return student, err
-}
-
-func (r *StudentService) GetStudentByID2(id uint) (*entity.Student, error) {
-	var student entity.Student
-	sql := "SELECT * FROM students WHERE id = ?"
-	err := r.db.WithContext(context.Background()).Raw(sql, id).Scan(&student).Error
-	return &student, err
+func (s *StudentService) FindByID(ctx context.Context, id int64) (*entity.Student, error) {
+	student, err := s.FindByID(ctx, id)
+	if err != nil {
+		return nil, err
+	}
+	return student, nil
 }

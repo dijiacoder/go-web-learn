@@ -1,9 +1,9 @@
 package handler
 
 import (
+	"context"
 	"github.com/dijiacoder/go-web-learn/internal/service"
 	"github.com/gin-gonic/gin"
-	"gorm.io/gorm"
 	"net/http"
 	"strconv"
 )
@@ -12,9 +12,9 @@ type StudentHandler struct {
 	studentService *service.StudentService
 }
 
-func NewStudentHandler(db *gorm.DB) *StudentHandler {
+func NewStudentHandler(container *service.Container) *StudentHandler {
 	return &StudentHandler{
-		studentService: service.NewStudentService(db),
+		studentService: container.StudentService,
 	}
 }
 
@@ -26,7 +26,7 @@ func (h *StudentHandler) GetStudentByID(c *gin.Context) {
 		return
 	}
 
-	student, err := h.studentService.GetStudentByID2(uint(id))
+	student, err := h.studentService.FindByID(context.Background(), int64(id))
 	if err != nil {
 		c.JSON(http.StatusInternalServerError, gin.H{"error": err.Error()})
 		return

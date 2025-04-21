@@ -17,7 +17,7 @@ import (
 
 	"gorm.io/plugin/dbresolver"
 
-	"github.com/dijiacoder/go-web-learn/internal/models/entity"
+	"github.com/dijiacoder/go-web-learn/internal/model/gen/entity"
 )
 
 func newStudent(db *gorm.DB, opts ...gen.DOOption) student {

@@ -26,8 +26,10 @@ func main() {
 
 	// 修改后的生成器配置
 	g := gen.NewGenerator(gen.Config{
-		OutPath:       "D:\\Web3\\go-web-learn\\internal\\models\\query",
-		ModelPkgPath:  "D:\\Web3\\go-web-learn\\internal\\models\\entity",
+		//OutPath:       "D:\\Web3\\go-web-learn\\internal\\model\\gen\\query",
+		//ModelPkgPath:  "D:\\Web3\\go-web-learn\\internal\\model\\gen\\entity",
+		OutPath:       "D:\\dijiaCoder\\go-web-learn\\internal\\model\\gen\\query",
+		ModelPkgPath:  "D:\\dijiaCoder\\go-web-learn\\internal\\model\\gen\\entity",
 		Mode:          gen.WithDefaultQuery | gen.WithQueryInterface | gen.WithoutContext,
 		FieldNullable: true,
 	})

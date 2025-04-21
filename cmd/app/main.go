@@ -3,15 +3,30 @@ package main
 import (
 	"github.com/dijiacoder/go-web-learn/internal/config"
 	"github.com/dijiacoder/go-web-learn/internal/handler"
+	"github.com/dijiacoder/go-web-learn/internal/infra"
 	"github.com/gin-gonic/gin"
 	"log"
 )
 
+const (
+	defaultConfigPath = "./config.yaml"
+)
+
 func main() {
 	// 初始化数据库
-	db, err := config.InitDB()
+	//db, err := config.InitDB()
+	//if err != nil {
+	//	log.Fatal("数据库初始化失败:", err)
+	//}
+
+	cfg, err := config.UnmarshalConfig(defaultConfigPath)
 	if err != nil {
-		log.Fatal("数据库初始化失败:", err)
+		log.Fatal("配置文件解析失败:", err)
+	}
+	
+	db, err := infra.InitMysql(cfg)
+	if err != nil {
+		log.Fatal("init mysql error", err)
 	}
 
 	//StudentHandler
