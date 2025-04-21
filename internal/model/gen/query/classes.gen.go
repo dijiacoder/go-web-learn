@@ -6,7 +6,7 @@ package query
 
 import (
 	"context"
-	"github.com/dijiacoder/go-web-learn/internal/model"
+	"database/sql"
 
 	"gorm.io/gorm"
 	"gorm.io/gorm/clause"
@@ -16,13 +16,15 @@ import (
 	"gorm.io/gen/field"
 
 	"gorm.io/plugin/dbresolver"
+
+	"github.com/dijiacoder/go-web-learn/internal/model/gen/entity"
 )
 
 func newClass(db *gorm.DB, opts ...gen.DOOption) class {
 	_class := class{}
 
 	_class.classDo.UseDB(db, opts...)
-	_class.classDo.UseModel(&model.Class{})
+	_class.classDo.UseModel(&entity.Class{})
 
 	tableName := _class.classDo.TableName()
 	_class.ALL = field.NewAsterisk(tableName)
@@ -140,17 +142,17 @@ type IClassDo interface {
 	Count() (count int64, err error)
 	Scopes(funcs ...func(gen.Dao) gen.Dao) IClassDo
 	Unscoped() IClassDo
-	Create(values ...*model.Class) error
-	CreateInBatches(values []*model.Class, batchSize int) error
-	Save(values ...*model.Class) error
-	First() (*model.Class, error)
-	Take() (*model.Class, error)
-	Last() (*model.Class, error)
-	Find() ([]*model.Class, error)
-	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Class, err error)
-	FindInBatches(result *[]*model.Class, batchSize int, fc func(tx gen.Dao, batch int) error) error
+	Create(values ...*entity.Class) error
+	CreateInBatches(values []*entity.Class, batchSize int) error
+	Save(values ...*entity.Class) error
+	First() (*entity.Class, error)
+	Take() (*entity.Class, error)
+	Last() (*entity.Class, error)
+	Find() ([]*entity.Class, error)
+	FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*entity.Class, err error)
+	FindInBatches(result *[]*entity.Class, batchSize int, fc func(tx gen.Dao, batch int) error) error
 	Pluck(column field.Expr, dest interface{}) error
-	Delete(...*model.Class) (info gen.ResultInfo, err error)
+	Delete(...*entity.Class) (info gen.ResultInfo, err error)
 	Update(column field.Expr, value interface{}) (info gen.ResultInfo, err error)
 	UpdateSimple(columns ...field.AssignExpr) (info gen.ResultInfo, err error)
 	Updates(value interface{}) (info gen.ResultInfo, err error)
@@ -162,10 +164,12 @@ type IClassDo interface {
 	Assign(attrs ...field.AssignExpr) IClassDo
 	Joins(fields ...field.RelationField) IClassDo
 	Preload(fields ...field.RelationField) IClassDo
-	FirstOrInit() (*model.Class, error)
-	FirstOrCreate() (*model.Class, error)
-	FindByPage(offset int, limit int) (result []*model.Class, count int64, err error)
+	FirstOrInit() (*entity.Class, error)
+	FirstOrCreate() (*entity.Class, error)
+	FindByPage(offset int, limit int) (result []*entity.Class, count int64, err error)
 	ScanByPage(result interface{}, offset int, limit int) (count int64, err error)
+	Rows() (*sql.Rows, error)
+	Row() *sql.Row
 	Scan(result interface{}) (err error)
 	Returning(value interface{}, columns ...string) IClassDo
 	UnderlyingDB() *gorm.DB
@@ -264,57 +268,57 @@ func (c classDo) Unscoped() IClassDo {
 	return c.withDO(c.DO.Unscoped())
 }
 
-func (c classDo) Create(values ...*model.Class) error {
+func (c classDo) Create(values ...*entity.Class) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Create(values)
 }
 
-func (c classDo) CreateInBatches(values []*model.Class, batchSize int) error {
+func (c classDo) CreateInBatches(values []*entity.Class, batchSize int) error {
 	return c.DO.CreateInBatches(values, batchSize)
 }
 
 // Save : !!! underlying implementation is different with GORM
 // The method is equivalent to executing the statement: db.Clauses(clause.OnConflict{UpdateAll: true}).Create(values)
-func (c classDo) Save(values ...*model.Class) error {
+func (c classDo) Save(values ...*entity.Class) error {
 	if len(values) == 0 {
 		return nil
 	}
 	return c.DO.Save(values)
 }
 
-func (c classDo) First() (*model.Class, error) {
+func (c classDo) First() (*entity.Class, error) {
 	if result, err := c.DO.First(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Class), nil
+		return result.(*entity.Class), nil
 	}
 }
 
-func (c classDo) Take() (*model.Class, error) {
+func (c classDo) Take() (*entity.Class, error) {
 	if result, err := c.DO.Take(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Class), nil
+		return result.(*entity.Class), nil
 	}
 }
 
-func (c classDo) Last() (*model.Class, error) {
+func (c classDo) Last() (*entity.Class, error) {
 	if result, err := c.DO.Last(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Class), nil
+		return result.(*entity.Class), nil
 	}
 }
 
-func (c classDo) Find() ([]*model.Class, error) {
+func (c classDo) Find() ([]*entity.Class, error) {
 	result, err := c.DO.Find()
-	return result.([]*model.Class), err
+	return result.([]*entity.Class), err
 }
 
-func (c classDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*model.Class, err error) {
-	buf := make([]*model.Class, 0, batchSize)
+func (c classDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error) (results []*entity.Class, err error) {
+	buf := make([]*entity.Class, 0, batchSize)
 	err = c.DO.FindInBatches(&buf, batchSize, func(tx gen.Dao, batch int) error {
 		defer func() { results = append(results, buf...) }()
 		return fc(tx, batch)
@@ -322,7 +326,7 @@ func (c classDo) FindInBatch(batchSize int, fc func(tx gen.Dao, batch int) error
 	return results, err
 }
 
-func (c classDo) FindInBatches(result *[]*model.Class, batchSize int, fc func(tx gen.Dao, batch int) error) error {
+func (c classDo) FindInBatches(result *[]*entity.Class, batchSize int, fc func(tx gen.Dao, batch int) error) error {
 	return c.DO.FindInBatches(result, batchSize, fc)
 }
 
@@ -348,23 +352,23 @@ func (c classDo) Preload(fields ...field.RelationField) IClassDo {
 	return &c
 }
 
-func (c classDo) FirstOrInit() (*model.Class, error) {
+func (c classDo) FirstOrInit() (*entity.Class, error) {
 	if result, err := c.DO.FirstOrInit(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Class), nil
+		return result.(*entity.Class), nil
 	}
 }
 
-func (c classDo) FirstOrCreate() (*model.Class, error) {
+func (c classDo) FirstOrCreate() (*entity.Class, error) {
 	if result, err := c.DO.FirstOrCreate(); err != nil {
 		return nil, err
 	} else {
-		return result.(*model.Class), nil
+		return result.(*entity.Class), nil
 	}
 }
 
-func (c classDo) FindByPage(offset int, limit int) (result []*model.Class, count int64, err error) {
+func (c classDo) FindByPage(offset int, limit int) (result []*entity.Class, count int64, err error) {
 	result, err = c.Offset(offset).Limit(limit).Find()
 	if err != nil {
 		return
@@ -393,7 +397,7 @@ func (c classDo) Scan(result interface{}) (err error) {
 	return c.DO.Scan(result)
 }
 
-func (c classDo) Delete(models ...*model.Class) (result gen.ResultInfo, err error) {
+func (c classDo) Delete(models ...*entity.Class) (result gen.ResultInfo, err error) {
 	return c.DO.Delete(models)
 }
 
