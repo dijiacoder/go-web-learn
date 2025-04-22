@@ -6,6 +6,7 @@ import (
 
 type Container struct {
 	StudentService *StudentService
+	ClassService   *ClassService
 
 	//TODO
 }
@@ -13,7 +14,7 @@ type Container struct {
 func NewServiceContainer(container *repository.Container) *Container {
 	return &Container{
 		StudentService: NewStudentService(container),
-
+		ClassService:   NewClassService(container),
 		//TODO
 	}
 }

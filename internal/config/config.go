@@ -18,6 +18,7 @@ type MysqlConf struct {
 }
 
 func UnmarshalConfig(configFilePath string) (*Config, error) {
+	viper.AddConfigPath(".")
 	viper.SetConfigName(configFilePath)
 	viper.SetConfigType("yaml")
 	if err := viper.ReadInConfig(); err != nil {

@@ -7,17 +7,17 @@ import (
 )
 
 type StudentService struct {
-	StudentRepo *repository.StudentRepository
+	studentRepo *repository.StudentRepository
 }
 
 func NewStudentService(container *repository.Container) *StudentService {
 	return &StudentService{
-		StudentRepo: container.StudentRepo,
+		studentRepo: container.StudentRepo,
 	}
 }
 
 func (s *StudentService) FindByID(ctx context.Context, id int64) (*entity.Student, error) {
-	student, err := s.FindByID(ctx, id)
+	student, err := s.studentRepo.FindByID(ctx, id)
 	if err != nil {
 		return nil, err
 	}
